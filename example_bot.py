@@ -1,6 +1,7 @@
-'''
+"""
 Simple example pokerbot, written in Python.
-'''
+"""
+
 from pkbot.actions import ActionFold, ActionCall, ActionCheck, ActionRaise, ActionBid
 from pkbot.states import GameInfo, PokerState
 from pkbot.base import BaseBot
@@ -10,12 +11,12 @@ import random
 
 
 class Player(BaseBot):
-    '''
+    """
     A pokerbot.
-    '''
+    """
 
     def __init__(self) -> None:
-        '''
+        """
         Called when a new game starts. Called exactly once.
 
         Arguments:
@@ -23,11 +24,11 @@ class Player(BaseBot):
 
         Returns:
         Nothing.
-        '''
+        """
         pass
 
     def on_hand_start(self, game_info: GameInfo, current_state: PokerState) -> None:
-        '''
+        """
         Called when a new round starts. Called NUM_ROUNDS times.
 
         Arguments:
@@ -36,24 +37,26 @@ class Player(BaseBot):
 
         Returns:
         Nothing.
-        '''
-        my_bankroll = game_info.bankroll  # the total number of chips you've gained or lost from the beginning of the game to the start of this round
+        """
+        my_bankroll = (
+            game_info.bankroll
+        )  # the total number of chips you've gained or lost from the beginning of the game to the start of this round
         # the total number of seconds your bot has left to play this game
         time_bank = game_info.time_bank
         round_num = game_info.round_num  # the round number from 1 to NUM_ROUNDS
-        
+
         # your cards
         # is an array; eg: ['Ah', 'Kd'] for Ace of hearts and King of diamonds
         my_cards = current_state.my_hand
 
         # opponent's  revealed cards or [] if not revealed
         opp_revealed_cards = current_state.opp_revealed_cards
-        
+
         big_blind = current_state.is_bb  # True if you are the big blind
         pass
 
     def on_hand_end(self, game_info: GameInfo, current_state: PokerState) -> None:
-        '''
+        """
         Called when a round ends. Called NUM_ROUNDS times.
 
         Arguments:
@@ -62,10 +65,12 @@ class Player(BaseBot):
 
         Returns:
         Nothing.
-        '''
+        """
         my_delta = current_state.payoff  # your bankroll change from this round
-        
-        street = current_state.street  # 'pre-flop', 'flop', 'auction', 'turn', or 'river'
+
+        street = (
+            current_state.street
+        )  # 'pre-flop', 'flop', 'auction', 'turn', or 'river'
         # your cards
         # is an array; eg: ['Ah', 'Kd'] for Ace of hearts and King of diamonds
         my_cards = current_state.my_hand
@@ -73,8 +78,10 @@ class Player(BaseBot):
         # opponent's revealed cards or [] if not revealed
         opp_revealed_cards = current_state.opp_revealed_cards
 
-    def get_move(self, game_info: GameInfo, current_state: PokerState) -> ActionFold | ActionCall | ActionCheck | ActionRaise | ActionBid:
-        '''
+    def get_move(
+        self, game_info: GameInfo, current_state: PokerState
+    ) -> ActionFold | ActionCall | ActionCheck | ActionRaise | ActionBid:
+        """
         Where the magic happens - your code should implement this function.
         Called any time the engine needs an action from your bot.
 
@@ -84,9 +91,9 @@ class Player(BaseBot):
 
         Returns:
         Your action.
-        '''
+        """
 
-        if current_state.street == 'auction':
+        if current_state.street == "auction":
             v = random.uniform(0, 0.3)
             return ActionBid(int(v * current_state.my_chips))
 
@@ -94,7 +101,7 @@ class Player(BaseBot):
             # Looking at info from bid
             for card in current_state.opp_revealed_cards:
                 # If opponent has a high card, we fold
-                if ('A' in card) or ('K' in card) or ('Q' in card) or ('J' in card):
+                if ("A" in card) or ("K" in card) or ("Q" in card) or ("J" in card):
                     if current_state.can_act(ActionFold):
                         return ActionFold()
                     else:
@@ -112,5 +119,5 @@ class Player(BaseBot):
         return ActionCall()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     run_bot(Player(), parse_args())
